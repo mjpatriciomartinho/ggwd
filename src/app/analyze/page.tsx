@@ -1,4 +1,5 @@
 import { AnalyzeApp } from "@/components/AnalyzeApp";
+import { access } from "@/lib/access";
 import { ReportList } from "@/components/ReportList";
 import { listAnalyses } from "@/lib/store";
 
@@ -7,7 +8,7 @@ export const metadata = { title: "Analyze a game" };
 
 export default async function AnalyzePage({ searchParams }: PageProps<"/analyze">) {
   const { mode } = await searchParams;
-  const analyses = await listAnalyses();
+  const [analyses, acc] = await Promise.all([listAnalyses(), access()]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 pt-14 pb-10 sm:px-8 sm:pt-20">
@@ -20,7 +21,19 @@ export default async function AnalyzePage({ searchParams }: PageProps<"/analyze"
         Each report uses one credit.
       </p>
 
-      <AnalyzeApp initialMode={mode === "describe" ? "describe" : "link"} />
+      {acc === "locked" && (
+        <div className="hud mb-6 rounded-xl border-ask/40 p-4 text-sm leading-relaxed">
+          <p className="font-pixel text-xs text-ask uppercase">🔒 Public demo</p>
+          <p className="mt-1 text-ink-2">
+            Running new reports spends real AI credits, so it&apos;s locked here. Hackathon judges: open the link with your
+            access code. Everyone else: the <a href="/examples" className="underline underline-offset-4">example reports</a>{" "}
+            and the <a href="/engine" className="underline underline-offset-4">engine room</a> are open.
+          </p>
+        </div>
+      )}
+      {acc === "unlocked" && <p className="font-pixel mb-4 text-xs text-pos uppercase">🔓 Judge mode: AI unlocked</p>}
+
+      <AnalyzeApp initialMode={mode === "describe" ? "describe" : "link"} locked={acc === "locked"} />
 
       <section className="mt-20">
         <div className="mb-2 flex items-baseline justify-between">

@@ -14,6 +14,10 @@ not just an internal tool. README.md has the setup details; this file has the co
   (there's a $3k "Best Use of Tavily" prize and $100 feedback prizes). Track: Best Apps and Agents. Needs a
   public repo with MIT license, demo URL, ≤3 min YouTube video, and the README feedback section filled in.
 - Local preview without keys: `GGWD_MOCK=1` in `.env.local` (Steam real, model/search answers canned).
+- **Judge access** (`src/lib/access.ts`): the public site is browsable, but `POST /api/analyses` and
+  `POST /api/discover` need `JUDGE_CODE` (Worker secret), given as `?code=` on any page (stored in an httpOnly
+  cookie by `/api/access`) or the `x-ggwd-code` header. No `JUDGE_CODE` = open, as in local dev.
+- Code: private repo https://github.com/mjpatriciomartinho/ggwd (branch `main`); make it public to submit.
 
 - Not deployed yet in María's own accounts, and no public repo yet (both needed for the hackathon). Any
   earlier deployment, database or repo belonged to a previous owner and must not be reused.

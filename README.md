@@ -59,6 +59,16 @@ Model ids are resolved against Token Factory's `GET /v1/models`, so a renamed id
 - **Tavily** (`src/lib/tavily.ts`): runtime `POST /search` calls in every report (3 per game) and every game
   suggestion run (2-3), logged and shown live.
 
+## Public demo and judge access
+
+The demo is public, but running new reports or game suggestions spends real AI credits, so those two actions
+need an access code. Judges: open any page of the demo with `?code=<your code>` (the full link is in the
+submission's testing instructions). The code is stored in a cookie for 30 days and the page shows
+"Judge mode: AI unlocked". Example reports, the engine room and everything else are open to anyone.
+
+The code is the `JUDGE_CODE` secret; without it set (local dev), everything is open. The MCP server sends it as
+the `x-ggwd-code` header when `GGWD_CODE` is set.
+
 ## Run it locally
 
 ```bash

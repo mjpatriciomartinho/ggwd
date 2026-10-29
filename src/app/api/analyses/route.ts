@@ -1,3 +1,4 @@
+import { requireAccess } from "@/lib/access";
 import { handle } from "@/lib/http";
 import { InputError, startAnalysis } from "@/lib/jobs";
 import { listAnalyses } from "@/lib/store";
@@ -9,6 +10,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   return handle(async () => {
+    await requireAccess();
     const body = (await req.json().catch(() => ({}))) as Partial<SampleOptions> & { url?: string };
     if (!body.url) throw new InputError("Missing url.");
     const options: SampleOptions = {

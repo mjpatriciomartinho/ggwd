@@ -9,6 +9,8 @@ import { z } from "zod";
 import type { Analysis, AnalysisListItem, Job, Review, Source } from "../src/lib/types.js";
 
 const BASE = process.env.GGWD_URL ?? "http://localhost:3100";
+// On the public site, AI actions need the judge/access code (GGWD_CODE), sent as a header.
+const CODE = process.env.GGWD_CODE ?? null;
 // The deployed site is password-protected (HTTP Basic, any username) while it's private.
 const AUTH = process.env.GGWD_PASSWORD ? `Basic ${Buffer.from(`mcp:${process.env.GGWD_PASSWORD}`).toString("base64")}` : null;
 
@@ -20,6 +22,7 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
       headers: {
         ...(body ? { "Content-Type": "application/json" } : {}),
         ...(AUTH ? { Authorization: AUTH } : {}),
+        ...(CODE ? { "x-ggwd-code": CODE } : {}),
       },
       body: body ? JSON.stringify(body) : undefined,
     });

@@ -48,6 +48,8 @@ export function EngineHUD() {
     >
       {lamp("Nebius", state?.nebius, "var(--nv)")}
       {lamp("Tavily", state?.tavily, "var(--tv)")}
+      {state?.access === "locked" && <span className="text-ink-3">🔒 AI locked</span>}
+      {state?.access === "unlocked" && <span className="text-pos">🔓 Judge mode</span>}
       {running.length > 0 && (
         <span className="max-w-[220px] truncate text-ask">
           ▶ {running[0].label}

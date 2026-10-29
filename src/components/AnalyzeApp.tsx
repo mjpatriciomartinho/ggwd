@@ -41,7 +41,7 @@ const EXAMPLES = [
 
 const num = new Intl.NumberFormat("en-US");
 
-export function AnalyzeApp({ initialMode }: { initialMode: Mode }) {
+export function AnalyzeApp({ initialMode, locked = false }: { initialMode: Mode; locked?: boolean }) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [options, setOptions] = useState<Options>({ perSide: 200, language: "english", reportLanguage: "en" });
@@ -151,7 +151,7 @@ export function AnalyzeApp({ initialMode }: { initialMode: Mode }) {
     setJobs((prev) => [...started, ...prev]);
   }
 
-  const busy = active.length > 0;
+  const busy = active.length > 0 || locked;
 
   return (
     <div>
@@ -198,7 +198,7 @@ export function AnalyzeApp({ initialMode }: { initialMode: Mode }) {
               disabled={busy || !url.trim()}
               className="font-display btn-hot rounded-lg px-6 py-3.5 font-bold uppercase disabled:opacity-40"
             >
-              {busy ? "Engines running…" : "Fire it up"}
+              {locked ? "🔒 Locked" : busy ? "Engines running…" : "Fire it up"}
             </button>
           </div>
           <OptionsBar options={options} setOptions={setOptions} disabled={busy} />
@@ -221,10 +221,10 @@ export function AnalyzeApp({ initialMode }: { initialMode: Mode }) {
             <p className="text-sm text-ink-3">Free. Nano reads your pitch, Tavily scouts the market, Super picks the games.</p>
             <button
               type="submit"
-              disabled={suggesting || description.trim().length < 30}
+              disabled={locked || suggesting || description.trim().length < 30}
               className="font-display btn-hot rounded-lg px-5 py-2.5 font-bold uppercase disabled:opacity-40"
             >
-              {suggesting ? "Finding games…" : "Suggest games to study"}
+              {locked ? "🔒 Locked" : suggesting ? "Finding games…" : "Suggest games to study"}
             </button>
           </div>
         </form>
