@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ggwd": {
+      "command": "npx",
+      "args": ["tsx", "mcp/server.mts"],
+      "env": { "GGWD_URL": "http://localhost:3100" }
+    }
+  }
+}

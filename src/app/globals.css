@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/*
+  ggwd tokens, arcade edition. Night-mode only: a deep violet-black with neon verdicts (mint =
+  recommended, hot red = not recommended, yellow = what players ask for), violet for actions, and one
+  color per engine: NVIDIA green for the Nemotron models on Nebius, cyan for Tavily.
+*/
+:root {
+  color-scheme: dark;
+  --paper: #0c0a12;
+  --sheet: #15121d;
+  --ink: #f3f0e8;
+  --ink-2: #bdb6cc;
+  --ink-3: #807896;
+  --line: #2b2639;
+  --pos: #3dffa2;
+  --pos-soft: #10291f;
+  --neg: #ff4f6e;
+  --neg-soft: #33131c;
+  --ask: #ffcf3a;
+  --ask-soft: #302710;
+  --hot: #b56bff;
+  --hot-ink: #0c0a12;
+  --nv: #76b900;
+  --tv: #4cc9ff;
+  --focus: #b56bff;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-pos: var(--pos);
+  --color-pos-soft: var(--pos-soft);
+  --color-neg: var(--neg);
+  --color-neg-soft: var(--neg-soft);
+  --color-ask: var(--ask);
+  --color-ask-soft: var(--ask-soft);
+  --color-hot: var(--hot);
+  --color-nv: var(--nv);
+  --color-tv: var(--tv);
+  --font-sans: var(--ff-body);
+  --font-display: var(--ff-display);
+  --font-pixel: var(--ff-pixel);
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 70% -10%, color-mix(in srgb, var(--hot) 16%, transparent), transparent 70%),
+    radial-gradient(900px 400px at -10% 30%, color-mix(in srgb, var(--nv) 9%, transparent), transparent 70%),
+    linear-gradient(color-mix(in srgb, var(--line) 35%, transparent) 1px, transparent 1px) 0 0 / 100% 32px,
+    var(--paper);
+  font-family: var(--ff-body), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--ff-display), var(--ff-body), sans-serif;
+}
+
+.font-pixel {
+  font-family: var(--ff-pixel), monospace;
+  letter-spacing: 0.02em;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--hot);
+  color: var(--hot-ink);
+}
+
+/* The main call to action: a chunky arcade button with a hard offset shadow. */
+.btn-hot {
+  background: var(--hot);
+  color: var(--hot-ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.btn-hot:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+.btn-hot:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* HUD panel: a sheet with a thin neon frame. */
+.hud {
+  background: color-mix(in srgb, var(--sheet) 92%, transparent);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 3%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chorus-bar {
+    transition: opacity 180ms ease;
+  }
+  .reveal-strip .chorus-bar {
+    animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+    animation-delay: calc(var(--i) * 1.4ms);
+  }
+
+  /* Steam engines: puffs drift up from the chimney, wheels turn, the body bobs. */
+  .engine-on .puff {
+    animation: puff 1.6s ease-out infinite;
+    animation-delay: var(--d);
+  }
+  .engine-on .wheel {
+    animation: spin 0.9s linear infinite;
+  }
+  .engine-on .bob {
+    animation: bob 0.45s ease-in-out infinite alternate;
+  }
+  .radar-on .sweep {
+    animation: spin 1.8s linear infinite;
+  }
+  .radar-on .blip {
+    animation: blip 1.8s ease-out infinite;
+    animation-delay: var(--d);
+  }
+  .blink {
+    animation: blink 1s steps(2, start) infinite;
+  }
+  .stripes {
+    background-image: repeating-linear-gradient(-45deg, transparent 0 8px, color-mix(in srgb, var(--paper) 35%, transparent) 8px 16px);
+    background-size: 22.6px 22.6px;
+    animation: stripes 0.8s linear infinite;
+  }
+}
+
+.puff {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.wheel,
+.sweep {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes rise {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes puff {
+  0% {
+    opacity: 0.85;
+    transform: translate(0, 0) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-14px, -26px) scale(1.9);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bob {
+  to {
+    transform: translateY(-1.2px);
+  }
+}
+@keyframes blip {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+@keyframes stripes {
+  to {
+    background-position: 22.6px 0;
+  }
+}

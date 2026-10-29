@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Neutral resource names on purpose: the product name isn't final.
+  "name": "game-reviews",
+  "main": "custom-worker.ts",
+  "compatibility_date": "2026-10-13",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  "upload_source_maps": true,
+  // `server-only` throws outside Next's react-server build, and the Workflow is bundled by Wrangler.
+  "alias": { "server-only": "./src/lib/empty.ts" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "game-reviews",
+      "database_id": "00000000-0000-0000-0000-000000000000", // placeholder: set to the real id after `wrangler d1 create game-reviews`
+      "migrations_dir": "migrations"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "game-reviews-analysis",
+      "binding": "ANALYSIS_WORKFLOW",
+      "class_name": "AnalysisWorkflow"
+    }
+  ],
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "game-reviews" }]
+}
