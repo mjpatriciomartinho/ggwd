@@ -181,7 +181,8 @@ export async function skimReviews(
         task: "skim",
         label: `Skim batch ${b + 1}/${batches.length}`,
         schema: SkimSchema,
-        maxTokens: 12000,
+        // 12k ran out on a batch of long Vampire Survivors reviews (4 points + quotes × 40 reviews).
+        maxTokens: 24000,
         system: `You read Steam reviews of a video game for a game developer and note each review's concrete points:
 what the player loves, what frustrates them, what they ask for, and why they quit if they did. Be specific
 to this game (mechanics, systems, moments, numbers), never generic like "fun gameplay". A recommended review

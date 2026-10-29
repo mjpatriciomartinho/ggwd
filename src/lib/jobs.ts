@@ -1,6 +1,7 @@
 import "server-only";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { db, bindDb } from "./db";
+import { closeRun } from "./engine";
 import { emptyLedger, scoutWeb, skimReviews, synthesize, type Ledger, type Notes, type Scouted } from "./analyze";
 import { collectReviews, fetchSource, parseSteamUrl } from "./platforms/steam";
 import { getReviews, getSource, saveAnalysis, saveReviews, saveSource } from "./store";
@@ -111,6 +112,7 @@ async function runInline(params: AnalysisParams) {
 }
 
 export async function failJob(jobId: string, err: unknown) {
+  await closeRun(jobId);
   await updateJob(jobId, { status: "error", error: err instanceof Error ? err.message : "Unexpected error" });
 }
 
@@ -187,6 +189,7 @@ export async function synthesizePhase(
     model: usage.byModel!.map((m) => m.label).join(" + "),
     usage,
   });
+  await closeRun(jobId);
   await updateJob(jobId, { status: "done", step: "", stage: "Done", detail: "", analysis_id: analysisId });
   return analysisId;
 }

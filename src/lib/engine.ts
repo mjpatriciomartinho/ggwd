@@ -69,6 +69,18 @@ export async function startEvent(e: EventStart): Promise<EventHandle> {
   };
 }
 
+/**
+ * Closes calls a run left open: when a Workflow step times out and retries, the call it was waiting on never
+ * reports back, and would otherwise show as a busy engine forever.
+ */
+export async function closeRun(runId: string) {
+  await db()
+    .prepare("UPDATE events SET status = 'error', detail = 'interrupted (step retried)', ended_at = ? WHERE run_id = ? AND status = 'running'")
+    .bind(Date.now(), runId)
+    .run()
+    .catch((err) => console.error("engine log", err));
+}
+
 export async function eventsFor(runId: string): Promise<EngineEvent[]> {
   const { results } = await db().prepare("SELECT * FROM events WHERE run_id = ? ORDER BY started_at").bind(runId).all<Row>();
   return results.map(toEvent);
