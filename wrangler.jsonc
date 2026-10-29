@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  // Neutral resource names on purpose: the product name isn't final.
-  "name": "game-reviews",
+  // Own names (ggwd*) so nothing collides with other projects in the same Cloudflare account.
+  "name": "ggwd",
   "main": "custom-worker.ts",
   "compatibility_date": "2026-10-13",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -13,17 +13,17 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "game-reviews",
-      "database_id": "00000000-0000-0000-0000-000000000000", // placeholder: set to the real id after `wrangler d1 create game-reviews`
+      "database_name": "ggwd",
+      "database_id": "61d520c3-d6f1-4eb1-b0b4-40722c30f07b",
       "migrations_dir": "migrations"
     }
   ],
   "workflows": [
     {
-      "name": "game-reviews-analysis",
+      "name": "ggwd-analysis",
       "binding": "ANALYSIS_WORKFLOW",
       "class_name": "AnalysisWorkflow"
     }
   ],
-  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "game-reviews" }]
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "ggwd" }]
 }

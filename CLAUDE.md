@@ -19,8 +19,9 @@ not just an internal tool. README.md has the setup details; this file has the co
   cookie by `/api/access`) or the `x-ggwd-code` header. No `JUDGE_CODE` = open, as in local dev.
 - Code: private repo https://github.com/mjpatriciomartinho/ggwd (branch `main`); make it public to submit.
 
-- Not deployed yet in María's own accounts, and no public repo yet (both needed for the hackathon). Any
-  earlier deployment, database or repo belonged to a previous owner and must not be reused.
+- **Deployed** (public, AI behind the judge code): https://ggwd.qz7-apps.workers.dev. It lives in a Cloudflare
+  account shared with other people's projects (subdomain `qz7-apps`), so every resource here is named `ggwd*`
+  (Worker `ggwd`, D1 `ggwd`, Workflow `ggwd-analysis`). Never touch `game-reviews` or other Workers there.
 - No accounts or payments yet. "Free during the preview" everywhere; pricing is shown but nothing charges.
 - Example reports (public showcase): Vampire Survivors and Balatro (`EXAMPLE_SOURCES` in `src/lib/site.ts`).
 
@@ -28,7 +29,7 @@ not just an internal tool. README.md has the setup details; this file has the co
 
 - **Name**: **ggwd** ("good game, well developed"), decided 2026-10-27; replaces the provisional "Murmur".
   Keep the logo (the tiny bars "chorus"). Name, contact and legal entity live only in `src/lib/site.ts`.
-  Cloudflare resources are named `game-reviews` on purpose so they survive renames.
+  Cloudflare resources are named `ggwd*`.
 - **Language**: whole UI and site in English. Reports default to English; Spanish is an option.
 - **Pricing**: credit packs, no subscription. 1 = $19, 3 = $49, 10 = $99 (featured), 30 = $219. Single and
   3-pack are priced close on purpose to push people to the 10-pack. Credits never expire. Game suggestions
@@ -37,7 +38,7 @@ not just an internal tool. README.md has the setup details; this file has the co
   my right of withdrawal" checkbox (EU). A failed report gives its credit back (not implemented yet).
 - **Legal**: operator "MJ", Spain. No contact email yet (`contactEmail` empty in `site.ts`: the footer hides
   "Contact" and legal pages show a placeholder). Privacy/terms are drafts to be reviewed by a lawyer before launch.
-- **Hosting**: Cloudflare Workers (the code depends on D1 and Workflows). Rejected EC2/Lightsail/Cloud Run.
+- **Hosting**: Cloudflare Workers Paid (the code depends on D1 and Workflows). Rejected EC2/Lightsail/Cloud Run.
 - **Platforms**: Steam now. Only Steam, iOS App Store and Google Play have written reviews worth analyzing.
   Next would be iOS (official public RSS feed, ~500 reviews per country, sortable by most helpful, no
   playtime), then Google Play (no official API; unofficial scraper, against their terms). Epic, Roblox,
@@ -51,9 +52,9 @@ not just an internal tool. README.md has the setup details; this file has the co
 
 - Next.js 16.4 (App Router) on Cloudflare Workers via OpenNext. `custom-worker.ts` is the Worker entry: it
   checks the password, then hands over to the OpenNext handler, and exports the Workflow class.
-- **D1** database `game-reviews` (binding `DB`), schema in `migrations/`. `src/lib/db.ts` gets it from the
+- **D1** database `ggwd` (binding `DB`), schema in `migrations/`. `src/lib/db.ts` gets it from the
   Cloudflare context; the Workflow passes its own binding with `bindDb()`.
-- **Workflow** `game-reviews-analysis` (`src/workflows/analysis.ts`): one step per pipeline phase,
+- **Workflow** `ggwd-analysis` (`src/workflows/analysis.ts`): one step per pipeline phase,
   retried independently. In `next dev` there are no Workflows, so `src/lib/jobs.ts` runs the same
   phases inline. Progress lives in the `jobs` table; UI and MCP poll `/api/jobs/:id`.
 - **AI** (`src/lib/llm.ts`): Nebius Token Factory (OpenAI-compatible, plain fetch, streaming, json_schema from
@@ -91,7 +92,6 @@ not just an internal tool. README.md has the setup details; this file has the co
 - Cloudflare: Worker secrets `NEBIUS_API_KEY`, `TAVILY_API_KEY` and, optionally, `SITE_PASSWORD` (HTTP Basic
   on the whole site while it's set). `scripts/cf.sh` runs wrangler/OpenNext with `CLOUDFLARE_API_TOKEN` and
   `CLOUDFLARE_ACCOUNT_ID` from SSM.
-- `wrangler.jsonc` has a placeholder D1 `database_id`: replace it with the id from `wrangler d1 create game-reviews`.
 
 ## Commands
 
