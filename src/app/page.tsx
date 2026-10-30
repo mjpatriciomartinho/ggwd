@@ -17,7 +17,7 @@ const STEPS = [
   },
   {
     title: "The engines get to work",
-    body: "Up to 700 of the most helpful reviews from launch to today. Tavily digs up what happened to the game, Nemotron Nano reads every review, Nemotron Ultra connects the dots.",
+    body: "Up to 700 of the most helpful reviews from launch to today. Tavily digs up what happened to the game, Nemotron Lightning reads every review, Nemotron Ultra connects the dots.",
   },
   {
     title: "You get the receipts",

@@ -12,7 +12,7 @@ const JOBS: { task: Task; what: string; example: number }[] = [
   { task: "skim", what: "Read each batch of 40 reviews, note every point", example: 14_000 },
   { task: "discover", what: "Pick the games worth studying", example: 4_000 },
   { task: "synthesize", what: "Weigh every note and write the report", example: 60_000 },
-  { task: "skim", what: "…a batch too long for Nano's window", example: 200_000 },
+  { task: "skim", what: "…a batch too long for Lightning's window", example: 800_000 },
 ];
 
 const POWER: Record<Power, string> = {
@@ -76,7 +76,7 @@ export default async function EnginePage() {
       <section className="mt-16">
         <h2 className="font-display text-3xl font-bold uppercase">The router</h2>
         <p className="mt-3 max-w-2xl leading-relaxed text-ink-2">
-          Small, parallel, mechanical jobs go to Nano. Someone waiting on an answer gets Super. The one call that has to weigh
+          Small, parallel, mechanical jobs go to Lightning. Someone waiting on an answer gets Super. The one call that has to weigh
           hundreds of reviews at once gets Ultra, with thinking on and a 1M-token window. If a model fails, the next in its chain takes over, and the log says so.
         </p>
         <div className="mt-6 overflow-x-auto">

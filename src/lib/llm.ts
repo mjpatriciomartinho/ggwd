@@ -38,6 +38,7 @@ async function modelId(tier: Tier, key: string): Promise<string> {
   if (ENV_ID[tier]) return ENV_ID[tier]!;
   const ids = await listModels(key);
   if (!ids.length || ids.includes(spec.id)) return spec.id;
+  if (spec.legacy && ids.includes(spec.legacy)) return spec.legacy;
   return ids.find((id) => id.toLowerCase().includes(spec.family)) ?? spec.id;
 }
 

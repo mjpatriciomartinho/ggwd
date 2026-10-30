@@ -218,7 +218,7 @@ export function AnalyzeApp({ initialMode, locked = false }: { initialMode: Mode;
             className="w-full resize-y rounded-xl bg-transparent px-4 py-3.5 leading-relaxed outline-none placeholder:text-ink-3 focus-visible:outline-none"
           />
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-3 pt-2.5 pb-1.5">
-            <p className="text-sm text-ink-3">Free. Nano reads your pitch, Tavily scouts the market, Super picks the games.</p>
+            <p className="text-sm text-ink-3">Free. Lightning reads your pitch, Tavily scouts the market, Super picks the games.</p>
             <button
               type="submit"
               disabled={locked || suggesting || description.trim().length < 30}

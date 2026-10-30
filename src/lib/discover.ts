@@ -5,7 +5,7 @@ import { searchSteam, summaryFor } from "./platforms/steam";
 import { webSearch } from "./tavily";
 
 // "Describe your game" → games worth studying, in three hops:
-//   1. Nemotron Nano reads the description and writes web searches for it.
+//   1. Nemotron Lightning reads the description and writes web searches for it.
 //   2. Tavily runs them, so picks can include games newer than the models' training data.
 //   3. Nemotron Super picks the games and explains each one.
 // Every pick is then looked up on the Steam store, so only real, reviewable games come back.

@@ -18,12 +18,12 @@ live in the UI (a steam locomotive with the model's name on its nameplate for Ne
 | --- | --- | --- |
 | Lookup | Steam store | Game details and overall score |
 | Collect | Steam store | Up to 700 most-helpful reviews, balanced between recommended and not, across launch, middle years and the last 12 months |
-| Scout | **Tavily Search** + **Nemotron 3 Nano** | 3 web searches (patch history, launch coverage, controversies); Nano turns the results into a dated timeline with a source URL per event |
-| Skim | **Nemotron 3 Nano** | Reads every review in parallel batches of 40, notes each concrete point with a verbatim quote |
+| Scout | **Tavily Search** + **Nemotron 3.5 Lightning** | 3 web searches (patch history, launch coverage, controversies); Lightning turns the results into a dated timeline with a source URL per event |
+| Skim | **Nemotron 3.5 Lightning** | Reads every review in parallel batches of 40, notes each concrete point with a verbatim quote |
 | Synthesize | **Nemotron 3 Ultra** (thinking on) | Weighs all notes at once and writes the report, tying shifts in opinion to the web timeline |
 
-"Describe your game" runs a smaller agent: **Nano** restates the pitch and writes search queries → **Tavily**
-searches the current market → **Nemotron 3 Super** picks 10-12 games with roles (benchmark, closest match,
+"Describe your game" runs a smaller agent: **Lightning** restates the pitch and writes search queries → **Tavily**
+searches the current market → **Nemotron 3.5 Super** picks 10-12 games with roles (benchmark, closest match,
 cautionary tale, same audience) → every pick is verified against the Steam store.
 
 Numbers are never the model's guess: models cite reviews by number and we compute every count, share and median.
@@ -33,10 +33,10 @@ Quotes that don't appear verbatim in their review are dropped.
 
 `src/lib/models.ts` picks a model per task, with a reason the UI shows next to every call (see `/engine`):
 
-- many small parallel reads (skim, timeline, query planning) → **Nemotron 3 Nano**: speed and price
-- someone waiting for an answer (game suggestions) → **Nemotron 3 Super**
+- many small parallel reads (skim, timeline, query planning) → **Nemotron 3.5 Lightning**: speed and price
+- someone waiting for an answer (game suggestions) → **Nemotron 3.5 Super**
 - the one call that weighs hundreds of reviews → **Nemotron 3 Ultra** with thinking on
-- input that doesn't fit Ultra's 128k window → **Super**'s 1M context
+- a skim batch too big for Lightning's window → **Super**
 - if a model fails, the next one in its fallback chain takes over (logged as such)
 
 Model ids are resolved against Token Factory's `GET /v1/models`, so a renamed id still matches by family.
@@ -55,9 +55,26 @@ Model ids are resolved against Token Factory's `GET /v1/models`, so a renamed id
 - **Nebius Token Factory** (`src/lib/llm.ts`): OpenAI-compatible `chat/completions` over plain `fetch` (it runs on
   Cloudflare Workers), streaming for live progress, `json_schema` structured output generated from zod schemas,
   `chat_template_kwargs.enable_thinking` per task, reasoning read from `message.reasoning`.
-- **NVIDIA Nemotron 3 Nano, Super and Ultra** (`src/lib/models.ts`, `src/lib/analyze.ts`, `src/lib/discover.ts`).
+- **NVIDIA Nemotron 3.5 Lightning, Nemotron 3.5 Super VL and Nemotron 3 Ultra** (`src/lib/models.ts`, `src/lib/analyze.ts`, `src/lib/discover.ts`).
 - **Tavily** (`src/lib/tavily.ts`): runtime `POST /search` calls in every report (3 per game) and every game
   suggestion run (2-3), logged and shown live.
+
+### Where Token Factory accelerated the work
+
+- **One endpoint, three model sizes.** Lightning, Super and Ultra sit behind the same OpenAI-compatible API and key,
+  so the router and its fallback chains are a few lines of code, and switching a task to another model is a
+  one-line change (or a `NEBIUS_MODEL_*` env var).
+- **Cheap, fast parallel reading.** Lightning skims batches of 40 reviews, 4 at a time (~35 s per batch on its
+  predecessor, Nemotron 3 Nano). This is
+  what makes reading hundreds of reviews per game affordable: a real 100-review report takes about 2 minutes
+  and ~52k tokens, for cents.
+- **A 1M-token window for the final call.** Ultra receives all the notes in a single call, so there is no
+  chunk-and-merge step that would lose the connections between themes.
+- **Structured output out of the box.** `json_schema` responses generated from zod schemas: no parsing hacks
+  or retry loops to fix malformed JSON.
+- **Model discovery.** `GET /v1/models` resolves the ids at runtime, so a renamed model still matches by family.
+
+Other Nebius services: none yet. Token Factory is the only Nebius service ggwd uses; hosting is Cloudflare Workers.
 
 ## Public demo and judge access
 
@@ -112,12 +129,15 @@ ggwd (first called Murmur) started, after the submission period opened, as a sin
 hackathon it was rebuilt around open models:
 
 - all inference moved to **NVIDIA Nemotron on Nebius Token Factory**, with a task-based router and fallbacks;
-- the single analysis call became a multi-model pipeline (Nano skims in parallel, Ultra synthesizes);
+- the single analysis call became a multi-model pipeline (the small model skims in parallel, Ultra synthesizes);
 - **Tavily** added for web context (timeline of updates and controversies) and market search for suggestions;
 - engine telemetry (`events` table) and the live UI: per-step progress bars, steam-engine sprites, engine log, `/engine`;
-- new arcade visual design.
+- new arcade visual design;
+- on Oct 30, Nebius announced that Nemotron 3 Nano and Super leave Token Factory Serverless on Nov 9, so the
+  small and mid tiers moved to the recommended replacements, **Nemotron 3.5 Lightning** and **Nemotron 3.5 Super
+  VL** (same prices, 1M context). The old ids are kept as a fallback while Token Factory still serves them.
 
 ## Feedback
 
 _To fill in after testing with real keys: Token Factory (structured output per model, streaming, reasoning
-field), Nemotron 3 Nano/Super/Ultra quality and latency, Tavily._
+field), Nemotron 3.5 Lightning / 3.5 Super / 3 Ultra quality and latency, Tavily._

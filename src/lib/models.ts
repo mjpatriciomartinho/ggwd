@@ -6,6 +6,7 @@ export type Tier = "nano" | "super" | "ultra";
 export interface ModelSpec {
   tier: Tier;
   id: string; // Token Factory model id (overridable with NEBIUS_MODEL_NANO / _SUPER / _ULTRA)
+  legacy?: string; // previous id, used only while Token Factory still serves it and not `id`
   family: string; // matched against /v1/models when the exact id isn't listed
   label: string;
   context: number; // tokens
@@ -16,21 +17,25 @@ export interface ModelSpec {
 export const MODELS: Record<Tier, ModelSpec> = {
   nano: {
     tier: "nano",
-    id: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
-    family: "nemotron-3-nano",
-    label: "Nemotron 3 Nano",
-    context: 262_144,
+    // Nemotron 3 Nano leaves Token Factory Serverless on 2026-11-09; Lightning is Nebius's replacement.
+    id: "nvidia/Nemotron-3_5-Lightning",
+    legacy: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+    family: "lightning",
+    label: "Nemotron 3.5 Lightning",
+    context: 1_048_576,
     price: { input: 0.06, output: 0.24 },
     blurb: "30B MoE, 3B active. Fast and cheap: reads every review.",
   },
   super: {
     tier: "super",
-    id: "nvidia/nemotron-3-super-120b-a12b",
-    family: "nemotron-3-super",
-    label: "Nemotron 3 Super",
-    context: 262_144,
+    // Nemotron 3 Super leaves Token Factory Serverless on 2026-11-09; 3.5 Super VL is Nebius's replacement.
+    id: "nvidia/Nemotron-3.5-Super-VL",
+    legacy: "nvidia/nemotron-3-super-120b-a12b",
+    family: "super-vl",
+    label: "Nemotron 3.5 Super",
+    context: 1_048_576,
     price: { input: 0.3, output: 0.9 },
-    blurb: "120B MoE, 12B active. The fast all-rounder.",
+    blurb: "The fast all-rounder, 1M context.",
   },
   ultra: {
     tier: "ultra",
@@ -59,7 +64,7 @@ export const estimateTokens = (text: string) => Math.ceil(text.length / 3.6);
 /**
  * Picks the model for a task. The rules are simple on purpose so the UI can explain every choice:
  * many small parallel reads go to Nano, interactive answers to Super, the one deep synthesis to Ultra,
- * and anything that doesn't fit a model's context moves up to Super's 1M window.
+ * and a skim batch that doesn't fit Lightning's window moves up to Super.
  */
 export function route(task: Task, inputTokens: number): Route {
   const fits = (tier: Tier) => inputTokens < MODELS[tier].context * 0.7;
@@ -67,7 +72,7 @@ export function route(task: Task, inputTokens: number): Route {
     case "skim":
       return fits("nano")
         ? { tier: "nano", thinking: false, fallbacks: ["super"], reason: "Many small parallel reads: speed and price win, no deep reasoning needed." }
-        : { tier: "super", thinking: false, fallbacks: [], reason: "Batch too big for Nano's window, moved up to Super." };
+        : { tier: "super", thinking: false, fallbacks: [], reason: "Batch too big for Lightning's window, moved up to Super." };
     case "digest":
       return { tier: "nano", thinking: false, fallbacks: ["super"], reason: "Turning web snippets into a dated timeline is extraction, not reasoning." };
     case "understand":

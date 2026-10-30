@@ -58,10 +58,11 @@ not just an internal tool. README.md has the setup details; this file has the co
   retried independently. In `next dev` there are no Workflows, so `src/lib/jobs.ts` runs the same
   phases inline. Progress lives in the `jobs` table; UI and MCP poll `/api/jobs/:id`.
 - **AI** (`src/lib/llm.ts`): Nebius Token Factory (OpenAI-compatible, plain fetch, streaming, json_schema from
-  zod). `src/lib/models.ts` holds the Nemotron 3 Nano/Super/Ultra roster and `route()`, which picks a model per
-  task with a human-readable reason and a fallback chain. Model ids verified against `GET /v1/models` on
-  2026-10-29 (Nano and Super 262k context, Ultra `nvidia/Nemotron-3-Ultra-550b-a55b` 1M); override with
-  `NEBIUS_MODEL_*`. Real run, 100 reviews: Nano skim ~35 s per batch of 40, Ultra report ~40 s, ~52k tokens.
+  zod). `src/lib/models.ts` holds the roster (tiers `nano`/`super`/`ultra`) and `route()`, which picks a model per
+  task with a human-readable reason and a fallback chain. Nemotron 3 Nano and Super leave Token Factory
+  Serverless on 2026-11-09, so the tiers now run `nvidia/Nemotron-3_5-Lightning` and `nvidia/Nemotron-3.5-Super-VL`
+  (same prices, 1M context, strict json_schema verified 2026-10-30), with the old ids as `legacy` fallback;
+  Ultra `nvidia/Nemotron-3-Ultra-550b-a55b` (1M) is unchanged. Override with `NEBIUS_MODEL_*`. Real run, 100 reviews: Nano skim ~35 s per batch of 40, Ultra report ~40 s, ~52k tokens.
 - **Engine log** (`src/lib/engine.ts`, `events` table): every model call and Tavily search is a row the UI polls
   (`/api/jobs/:id`, `/api/runs/:id`, `/api/engine`). The design brief: always show which model does what.
 - **Analysis** (`src/lib/analyze.ts`): pipeline lookup → collect → scout (Tavily + Nano timeline) → skim (Nano,

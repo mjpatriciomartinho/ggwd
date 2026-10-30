@@ -152,7 +152,7 @@ export interface Skimmed {
 }
 
 export async function skimPhase({ jobId }: AnalysisParams, source: Source, collected: Collected): Promise<Skimmed> {
-  await updateJob(jobId, { step: "skim", stage: "Skimming every review", detail: "Nemotron Nano reads in parallel batches", done: 0, total: 0 });
+  await updateJob(jobId, { step: "skim", stage: "Skimming every review", detail: "Nemotron Lightning reads in parallel batches", done: 0, total: 0 });
   const reviews = await getReviews(source.id, collected.reviewIds);
   return skimReviews(jobId, reviews, (done, total) =>
     void updateJob(jobId, { done, total, detail: `${done} of ${total} batches read` }).catch(() => {}),
